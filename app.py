@@ -6,7 +6,6 @@ from resources.item import Item, ItemList
 from resources.user import UserRegister
 from resources.store import Store, StoreList
 from security import authenticate, identity
-from db import db
 
 # Crear el objeto de la interfaz web
 app = Flask(__name__)
@@ -23,15 +22,6 @@ app.secret_key = 'edu'
 # Crear el objeto API
 api = Api(app=app)
 
-
-# Este decorador viene con flask. Se va a ejecutar antes de la primera request
-@app.before_first_request
-def create_tables():
-    db.create_all()
-    # Crea data.db si no existe. Pero solo crea las tablas que vea: por ejemplo, al importar Store resource,
-    # a su vez importa StoreModel, siendo esta la clase que crea la tabla
-
-
 # Create the object that allow us to check credentials
 jwt = JWT(app=app, authentication_handler=authenticate, identity_handler=identity)
 
@@ -42,5 +32,6 @@ api.add_resource(StoreList, '/stores')
 api.add_resource(UserRegister, '/register')
 
 if __name__ == '__main__':  # Asi solo se ejecuta si se ejecuta app.py; si se importa no se ejecuta, pues __name__ sera otro
+    from db import db
     db.init_app(app)
     app.run(port=5000, debug=True)
